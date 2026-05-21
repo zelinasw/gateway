@@ -27,10 +27,12 @@
     </div>
 
     <script>
-        // MASUKKAN KREDENSIAL SUPABASE KAMU DI SINI
+        // Kredensial Supabase milikmu yang sudah dimasukkan dengan benar
         const SUPABASE_URL = "https://minnxsggeqyypnzppjdk.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbm54c2dnZXF5eXBuenBwamRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMDUxMDgsImV4cCI6MjA5MzU4MTEwOH0.DmjA-THOVKD9dovF-Eea1ofToc8mrCB9TUrOEzuUZvY";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Perbaikan inisialisasi agar tidak tabrakan nama variabel objek
+        const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Fungsi pembentuk kode unik acak sepanjang 6 karakter (contoh: aB9zX1)
         function buatKodeAcak() {
@@ -43,54 +45,66 @@
         }
 
         document.getElementById("formLink").addEventListener("submit", async (e) => {
-            e.preventDefault();
+            // Mencegah halaman reload otomatis saat tombol ditekan (Menghindari reset halaman)
+            e.preventDefault(); 
+            
             const btn = document.getElementById("btn");
+            const inputArea = document.getElementById("bulkLinks");
+            const boxHasil = document.getElementById("boxHasil");
+            const hasilArea = document.getElementById("hasilLink");
+
             btn.disabled = true;
             btn.innerText = "Sedang Memproses Massal...";
             
-            // Ambil data text area, pisahkan berdasarkan baris, dan buang spasi kosong
-            const barisLink = document.getElementById("bulkLinks").value.split("\n");
-            const kumpulanDataInsert = [];
-            const kumpulanHasilLink = [];
-            const baseUrl = window.location.origin;
+            try {
+                // Ambil data text area, pisahkan berdasarkan baris, dan buang spasi kosong
+                const barisLink = inputArea.value.split("\n");
+                const kumpulanDataInsert = [];
+                const kumpulanHasilLink = [];
+                const baseUrl = window.location.origin;
 
-            for (let link of barisLink) {
-                let linkBersih = link.trim();
-                if (linkBersih !== "") {
-                    // Buat kode ID acak otomatis untuk link ini
-                    let kodeUnik = buatKodeAcak();
-                    
-                    kumpulanDataInsert.push({
-                        kode_unik: kodeUnik,
-                        link_tujuan: linkBersih
-                    });
+                for (let link of barisLink) {
+                    let linkBersih = link.trim();
+                    if (linkBersih !== "") {
+                        // Buat kode ID acak otomatis untuk link ini
+                        let kodeUnik = buatKodeAcak();
+                        
+                        kumpulanDataInsert.push({
+                            kode_unik: kodeUnik,
+                            link_tujuan: linkBersih
+                        });
 
-                    // Format output menggunakan akhiran .mp4 palsu untuk mengelabui bot Facebook
-                    kumpulanHasilLink.push(`${baseUrl}/${kodeUnik}.mp4`);
+                        // Format output menggunakan akhiran .mp4 palsu untuk mengelabui bot Facebook
+                        kumpulanHasilLink.push(`${baseUrl}/${kodeUnik}.mp4`);
+                    }
                 }
+
+                if (kumpulanDataInsert.length === 0) {
+                    alert("Masukkan minimal satu link!");
+                    btn.disabled = false;
+                    btn.innerText = "🚀 Generate Semua Link Jembatan";
+                    return;
+                }
+
+                // Masukkan data massal (Bulk Insert) ke Supabase dalam satu kali request
+                const { error } = await clientSupabase.from("link_jembatan").insert(kumpulanDataInsert);
+                
+                if (error) {
+                    alert("Gagal menyimpan ke database Supabase: " + error.message);
+                    console.error(error);
+                } else {
+                    // Tampilkan semua hasil link jembatan di kotak textarea bawah
+                    hasilArea.value = kumpulanHasilLink.join("\n");
+                    boxHasil.style.display = "block";
+                }
+
+            } catch (err) {
+                alert("Terjadi kesalahan sistem internal browser: " + err.message);
+                console.error(err);
             }
 
-            if (kumpulanDataInsert.length === 0) {
-                alert("Masukkan minimal satu link!");
-                btn.disabled = false;
-                btn.innerText = "🚀 Generate Semua Link Jembatan";
-                return;
-            }
-
-            // Masukkan data massal (Bulk Insert) ke Supabase dalam satu request gila-gilaan
-            const { error } = await supabase.from("link_jembatan").insert(kumpulanDataInsert);
-            
             btn.disabled = false;
             btn.innerText = "🚀 Generate Semua Link Jembatan";
-
-            if (error) {
-                alert("Gagal memproses ke database! Silakan coba lagi.");
-                console.error(error);
-            } else {
-                // Tampilkan semua hasil link jembatan di kotak textarea bawah
-                document.getElementById("hasilLink").value = kumpulanHasilLink.join("\n");
-                document.getElementById("boxHasil").style.display = "block";
-            }
         });
     </script>
 </body>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menyiapkan Pemutar Video...</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #111; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; border-left-color: #0099ff; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <div class="spinner"></div>
+        <h2 id="pesan">Menyiapkan Pemutar Video...</h2>
+        <p style="color: #aaa;">Mohon tunggu sejenak, sistem sedang mengamankan jalur.</p>
+    </div>
+
+    <script>
+        // MASUKKAN KREDENSIAL SUPABASE KAMU LANGSUNG DI SINI
+        const SUPABASE_URL = "https://xyz.supabase.co"; 
+        const SUPABASE_ANON_KEY = "ey..."; 
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function balikArah() {
+            let path = window.location.pathname.replace(/^\/|\.mp4$|\.map4$/g, "");
+
+            if(!path || path === "dashboard" || path === "dashboard.html") return;
+
+            const { data, error } = await supabase
+                .from("link_jembatan")
+                .select("link_tujuan")
+                .eq("kode_unik", path)
+                .single();
+
+            if (data && data.link_tujuan) {
+                setTimeout(() => { window.location.href = data.link_tujuan; }, 3000);
+            } else {
+                document.getElementById("pesan").innerText = "Link Kedaluwarsa. Mengalihkan...";
+                setTimeout(() => { window.location.href = "https://cdnviduy.site"; }, 2000);
+            }
+        }
+        balikArah();
+    </script>
+</body>
+</html>

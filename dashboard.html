@@ -20,9 +20,12 @@
         </form>
 
         <div id="boxHasil" style="display: none; margin-top: 30px; padding: 20px; background: #252525; border: 1px solid #0099ff; border-radius: 5px;">
-            <p style="margin: 0 0 10px 0; color: #0099ff; font-weight: bold;">Hasil Bulk Link Siap Tebar di FB (.mp4):</p>
-            <textarea id="hasilLink" readonly style="width: 100%; padding: 12px; background: #1e1e1e; color: #fff; border: 1px solid #444; border-radius: 5px; font-family: monospace; box-sizing: border-box;" rows="8" onclick="this.select(); document.execCommand('copy'); alert('Semua link berhasil disalin!');"></textarea>
-            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Klik di dalam kotak untuk menyalin semua hasil link sekaligus</small>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <p style="margin: 0; color: #0099ff; font-weight: bold;">Hasil Bulk Link Siap Tebar di FB (.mp4):</p>
+                <button type="button" id="btnCopy" style="padding: 6px 15px; background: #22c55e; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">📋 Copy All Links</button>
+            </div>
+            <textarea id="hasilLink" style="width: 100%; padding: 12px; background: #1e1e1e; color: #fff; border: 1px solid #444; border-radius: 5px; font-family: monospace; box-sizing: border-box; resize: vertical;" rows="8"></textarea>
+            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Gunakan tombol hijau untuk salin massal, atau blok langsung teks di atas jika ingin menyalin sebagian saja.</small>
         </div>
     </div>
 
@@ -43,6 +46,14 @@
             }
             return hasil;
         }
+
+        // Fungsi tombol copy massal
+        document.getElementById("btnCopy").addEventListener("click", () => {
+            const hasilArea = document.getElementById("hasilLink");
+            hasilArea.select();
+            document.execCommand("copy");
+            alert("Semua link berhasil disalin!");
+        });
 
         document.getElementById("formLink").addEventListener("submit", async (e) => {
             // Mencegah halaman reload otomatis saat tombol ditekan (Menghindari reset halaman)

@@ -6,8 +6,25 @@
     <title>Menyiapkan Pemutar Video...</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #111; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; border-left-color: #0099ff; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #111; 
+            color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .spinner { 
+            border: 4px solid rgba(255,255,255,0.1); 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            border-left-color: #0099ff; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto 20px; 
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -19,29 +36,49 @@
     </div>
 
     <script>
-        // MASUKKAN KREDENSIAL SUPABASE KAMU LANGSUNG DI SINI
-        const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co"; 
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw"; 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Kredensial Supabase terbaru milikmu sudah terpasang benar
+        const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
+        
+        // Memperbaiki inisialisasi client agar tidak tabrakan dengan nama library
+        const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function balikArah() {
-            let path = window.location.pathname.replace(/^\/|\.mp4$|\.map4$/g, "");
+            try {
+                // Mengambil kode unik dari URL dan membuang ekstensi palsu (.mp4 atau .map4)
+                let path = window.location.pathname.replace(/^\/|\.mp4$|\.map4$/g, "");
+                
+                // Jika halaman utama atau dashboard, abaikan fungsi redirect
+                if (!path || path === "dashboard" || path === "dashboard.html") return;
 
-            if(!path || path === "dashboard" || path === "dashboard.html") return;
+                // Mencari link tujuan asli di database Supabase berdasarkan kode_unik
+                const { data, error } = await clientSupabase
+                    .from("link_jembatan")
+                    .select("link_tujuan")
+                    .eq("kode_unik", path)
+                    .single();
 
-            const { data, error } = await supabase
-                .from("link_jembatan")
-                .select("link_tujuan")
-                .eq("kode_unik", path)
-                .single();
+                if (error) {
+                    console.error("Database Error:", error);
+                    document.getElementById("pesan").innerText = "Link Tidak Ditemukan!";
+                    return;
+                }
 
-            if (data && data.link_tujuan) {
-                setTimeout(() => { window.location.href = data.link_tujuan; }, 3000);
-            } else {
-                document.getElementById("pesan").innerText = "Link Kedaluwarsa. Mengalihkan...";
-                setTimeout(() => { window.location.href = "https://cdnviduy.site"; }, 2000);
+                if (data && data.link_tujuan) {
+                    // Berhasil ketemu, beri jeda 3 detik lalu lempar ke link video/affiliate asli
+                    setTimeout(() => { 
+                        window.location.href = data.link_tujuan; 
+                    }, 3000);
+                } else {
+                    document.getElementById("pesan").innerText = "Link Kedaluwarsa!";
+                }
+            } catch (err) {
+                console.error("System Error:", err);
+                document.getElementById("pesan").innerText = "Terjadi Kesalahan Jaringan!";
             }
         }
+        
+        // Jalankan fungsi pengalihan saat halaman dimuat
         balikArah();
     </script>
 </body>

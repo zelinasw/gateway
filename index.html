@@ -16,6 +16,10 @@
             height: 100vh; 
             margin: 0; 
         }
+        .container {
+            text-align: center;
+            max-width: 90%;
+        }
         .spinner { 
             border: 4px solid rgba(255,255,255,0.1); 
             width: 50px; 
@@ -26,13 +30,33 @@
             margin: 0 auto 20px; 
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Gaya Tombol "Lanjut Nonton" Darurat */
+        #linkManual {
+            display: none; /* Disembunyikan dulu, muncul kalau loading lambat atau sukses ketemu */
+            margin-top: 25px;
+            padding: 12px 24px;
+            background-color: #22c55e; /* Hijau cerah agar menarik perhatian */
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #linkManual:hover {
+            background-color: #16a34a;
+        }
     </style>
 </head>
 <body>
-    <div style="text-align: center;">
+    <div class="container">
         <div class="spinner"></div>
         <h2 id="pesan">Menyiapkan Pemutar Video...</h2>
         <p style="color: #aaa;">Mohon tunggu sejenak, sistem sedang mengamankan jalur.</p>
+        
+        <a href="#" id="linkManual">>>> KLIK DISINI UNTUK LANJUT NONTON <<<</a>
     </div>
 
     <script>
@@ -40,8 +64,8 @@
         const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
-        // Memperbaiki inisialisasi client agar tidak tabrakan dengan nama library
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const linkManualBtn = document.getElementById("linkManual");
 
         async function balikArah() {
             try {
@@ -65,10 +89,23 @@
                 }
 
                 if (data && data.link_tujuan) {
-                    // Berhasil ketemu, beri jeda 3 detik lalu lempar ke link video/affiliate asli
+                    // Ketemu! Kita pasang link aslinya di tombol hijau
+                    linkManualBtn.href = data.link_tujuan;
+                    
+                    // Kita munculkan tombol hijau tersebut setelah 1 detik animasi loading berjalan
+                    // agar penonton tahu ada tombol darurat jika loading lambat
+                    setTimeout(() => {
+                        linkManualBtn.style.display = "inline-block";
+                    }, 1000);
+
+                    // Proses redirect otomatis standar kita tetap berjalan setelah 3 detik
                     setTimeout(() => { 
-                        window.location.href = data.link_tujuan; 
+                        // Cek dulu, kalau penonton belum klik tombol manual, redirect otomatis jalan
+                        if (window.location.href !== data.link_tujuan) {
+                            window.location.href = data.link_tujuan;
+                        }
                     }, 3000);
+
                 } else {
                     document.getElementById("pesan").innerText = "Link Kedaluwarsa!";
                 }

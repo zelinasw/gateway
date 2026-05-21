@@ -3,53 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jembatan Link Generator</title>
+    <title>Bulk Jembatan Link Generator</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body style="background-color: #121212; color: #fff; font-family: sans-serif; padding: 40px; margin: 0;">
-    <div style="max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 30px; borderRadius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-        <h2 style="text-align: center; color: #0099ff;">🔗 Jembatan Link Generator</h2>
+    <div style="max-width: 700px; margin: 0 auto; background: #1e1e1e; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        <h2 style="text-align: center; color: #0099ff;">🔗 Bulk Jembatan Link Generator</h2>
+        <p style="color: #aaa; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 25px;">Copas banyak link dari fitur bulk web streaming kamu ke sini. Pisahkan dengan baris baru (Enter).</p>
+        
         <form id="formLink">
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px;">Kode Unik / ID Link</label>
-                <input type="text" id="kode" placeholder="Contoh: Ygbz07" required style="width: 100%; padding: 10px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box;">
-            </div>
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 5px;">Link Tujuan (Web Film / Affiliate)</label>
-                <input type="url" id="linkTujuan" placeholder="https://cdnviduy.site/..." required style="width: 100%; padding: 10px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Masukkan Semua Link Tujuan (Satu Link Per Baris)</label>
+                <textarea id="bulkLinks" rows="8" placeholder="https://cdnviduy.site/watch/film1&#10;https://cdnviduy.site/watch/film2&#10;https://cdnviduy.site/watch/film3" required style="width: 100%; padding: 12px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; font-family: monospace; resize: vertical;"></textarea>
             </div>
-            <button type="submit" id="btn" style="width: 100%; padding: 12px; background: #0099ff; color: #fff; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">🚀 Generate Jembatan Link</button>
+            <button type="submit" id="btn" style="width: 100%; padding: 14px; background: #0099ff; color: #fff; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">🚀 Generate Semua Link Jembatan</button>
         </form>
 
-        <div id="boxHasil" style="display: none; margin-top: 30px; padding: 15px; background: #252525; border: 1px solid #0099ff; border-radius: 5px;">
-            <p style="margin: 0 0 10px 0; color: #0099ff; font-weight: bold;">Hasil Link Siap Tebar:</p>
-            <input type="text" id="hasilLink" readonly style="width: 100%; padding: 10px; background: #1e1e1e; color: #fff; border: 1px solid #444; text-align: center;" onclick="this.select(); document.execCommand('copy'); alert('Link disalin!');">
-            <small style="color: #aaa; display: block; margin-top: 5px; text-align: center;">💡 Klik kolom untuk menyalin otomatis</small>
+        <div id="boxHasil" style="display: none; margin-top: 30px; padding: 20px; background: #252525; border: 1px solid #0099ff; border-radius: 5px;">
+            <p style="margin: 0 0 10px 0; color: #0099ff; font-weight: bold;">Hasil Bulk Link Siap Tebar di FB (.mp4):</p>
+            <textarea id="hasilLink" readonly style="width: 100%; padding: 12px; background: #1e1e1e; color: #fff; border: 1px solid #444; border-radius: 5px; font-family: monospace; box-sizing: border-box;" rows="8" onclick="this.select(); document.execCommand('copy'); alert('Semua link berhasil disalin!');"></textarea>
+            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Klik di dalam kotak untuk menyalin semua hasil link sekaligus</small>
         </div>
     </div>
 
     <script>
-        // MASUKKAN KREDENSIAL SUPABASE KAMU LANGSUNG DI SINI
+        // MASUKKAN KREDENSIAL SUPABASE KAMU DI SINI
         const SUPABASE_URL = "https://minnxsggeqyypnzppjdk.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbm54c2dnZXF5eXBuenBwamRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMDUxMDgsImV4cCI6MjA5MzU4MTEwOH0.DmjA-THOVKD9dovF-Eea1ofToc8mrCB9TUrOEzuUZvY";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Fungsi pembentuk kode unik acak sepanjang 6 karakter (contoh: aB9zX1)
+        function buatKodeAcak() {
+            const karakter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let hasil = '';
+            for (let i = 0; i < 6; i++) {
+                hasil += karakter.charAt(Math.floor(Math.random() * karakter.length));
+            }
+            return hasil;
+        }
+
         document.getElementById("formLink").addEventListener("submit", async (e) => {
             e.preventDefault();
             const btn = document.getElementById("btn");
-            btn.innerText = "Sedang Memproses...";
+            btn.disabled = true;
+            btn.innerText = "Sedang Memproses Massal...";
+            
+            // Ambil data text area, pisahkan berdasarkan baris, dan buang spasi kosong
+            const barisLink = document.getElementById("bulkLinks").value.split("\n");
+            const kumpulanDataInsert = [];
+            const kumpulanHasilLink = [];
+            const baseUrl = window.location.origin;
 
-            const kode = document.getElementById("kode").value.replace(/\.mp4$/g, "").trim();
-            const linkTujuan = document.getElementById("linkTujuan").value;
+            for (let link of barisLink) {
+                let linkBersih = link.trim();
+                if (linkBersih !== "") {
+                    // Buat kode ID acak otomatis untuk link ini
+                    let kodeUnik = buatKodeAcak();
+                    
+                    kumpulanDataInsert.push({
+                        kode_unik: kodeUnik,
+                        link_tujuan: linkBersih
+                    });
 
-            const { error } = await supabase.from("link_jembatan").insert([{ kode_unik: kode, link_tujuan: linkTujuan }]);
-            btn.innerText = "🚀 Generate Jembatan Link";
+                    // Format output menggunakan akhiran .mp4 palsu untuk mengelabui bot Facebook
+                    kumpulanHasilLink.push(`${baseUrl}/${kodeUnik}.mp4`);
+                }
+            }
+
+            if (kumpulanDataInsert.length === 0) {
+                alert("Masukkan minimal satu link!");
+                btn.disabled = false;
+                btn.innerText = "🚀 Generate Semua Link Jembatan";
+                return;
+            }
+
+            // Masukkan data massal (Bulk Insert) ke Supabase dalam satu request gila-gilaan
+            const { error } = await supabase.from("link_jembatan").insert(kumpulanDataInsert);
+            
+            btn.disabled = false;
+            btn.innerText = "🚀 Generate Semua Link Jembatan";
 
             if (error) {
-                alert("Gagal! Kode unik sudah terpakai.");
+                alert("Gagal memproses ke database! Silakan coba lagi.");
+                console.error(error);
             } else {
-                const baseUrl = window.location.origin;
-                document.getElementById("hasilLink").value = `${baseUrl}/${kode}.mp4`;
+                // Tampilkan semua hasil link jembatan di kotak textarea bawah
+                document.getElementById("hasilLink").value = kumpulanHasilLink.join("\n");
                 document.getElementById("boxHasil").style.display = "block";
             }
         });

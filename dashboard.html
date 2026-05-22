@@ -16,9 +16,9 @@
                 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Pilih Domain Jembatan</label>
                 <select id="pilihDomain" style="width: 100%; padding: 12px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; font-size: 15px; cursor: pointer;">
                     <option value="AUTO">Domain Saat Ini (Otomatis bawaan Cloudflare)</option>
-                    <option value="https://kliktonton.site">domain-jembatanA.com (Contoh Domain Utama)</option>
-                    <option value="https://vidley.site">domain-tumbalB.net (Contoh Domain Cadangan)</option>
-                    <option value="https://vidubmy.site">domain-filmC.xyz (Contoh Domain Alternatif)</option>
+                    <option value="https://kliktonton.site">https://kliktonton.site</option>
+                    <option value="https://vidley.site">https://vidley.site</option>
+                    <option value="https://vidubmy.site">https://vidubmy.site</option>
                 </select>
             </div>
 
@@ -40,10 +40,10 @@
     </div>
 
     <script>
-        // Kredensial Supabase milikmu yang kemarin sudah lancar
         const SUPABASE_URL = "https://minnxsggeqyypnzppjdk.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbm54c2dnZXF5eXBuenBwamRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
+        // Memastikan inisialisasi menggunakan clientSupabase
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function buatKodeAcak() {
@@ -79,10 +79,9 @@
                 const kumpulanDataInsert = [];
                 const kumpulanHasilLink = [];
                 
-                // LOGIKA MENENTUKAN BASE URL JEMBATAN
                 let baseUrl = window.location.origin;
                 if (pilihanDomain !== "AUTO") {
-                    baseUrl = pilihanDomain; // Pakai domain pilihan user dari dropdown
+                    baseUrl = pilihanDomain;
                 }
 
                 for (let link of barisLink) {
@@ -106,6 +105,7 @@
                     return;
                 }
 
+                // PERBAIKAN: Memanggil clientSupabase, bukan supabase
                 const { error } = await clientSupabase.from("link_jembatan").insert(kumpulanDataInsert);
                 
                 if (error) {

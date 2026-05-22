@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bulk Jembatan Link Generator</title>
+    <title>Bulk Jembatan Link Generator (Multi-Domain)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body style="background-color: #121212; color: #fff; font-family: sans-serif; padding: 40px; margin: 0;">
@@ -12,6 +12,16 @@
         <p style="color: #aaa; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 25px;">Copas banyak link dari fitur bulk web streaming kamu ke sini. Pisahkan dengan baris baru (Enter).</p>
         
         <form id="formLink">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Pilih Domain Jembatan</label>
+                <select id="pilihDomain" style="width: 100%; padding: 12px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; font-size: 15px; cursor: pointer;">
+                    <option value="AUTO">Domain Saat Ini (Otomatis bawaan Cloudflare)</option>
+                    <option value="https://kliktonton.site">domain-jembatanA.com (Contoh Domain Utama)</option>
+                    <option value="https://vidley.site">domain-tumbalB.net (Contoh Domain Cadangan)</option>
+                    <option value="https://vidubmy.site">domain-filmC.xyz (Contoh Domain Alternatif)</option>
+                </select>
+            </div>
+
             <div style="margin-bottom: 20px;">
                 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Masukkan Semua Link Tujuan (Satu Link Per Baris)</label>
                 <textarea id="bulkLinks" rows="8" placeholder="https://cdnviduy.site/watch/film1&#10;https://cdnviduy.site/watch/film2&#10;https://cdnviduy.site/watch/film3" required style="width: 100%; padding: 12px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; font-family: monospace; resize: vertical;"></textarea>
@@ -30,14 +40,12 @@
     </div>
 
     <script>
-        // Kredensial Supabase milikmu yang sudah dimasukkan dengan benar
-        const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
+        // Kredensial Supabase milikmu yang kemarin sudah lancar
+        const SUPABASE_URL = "https://minnxsggeqyypnzppjdk.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbm54c2dnZXF5eXBuenBwamRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
-        // Perbaikan inisialisasi agar tidak tabrakan nama variabel objek
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Fungsi pembentuk kode unik acak sepanjang 6 karakter (contoh: aB9zX1)
         function buatKodeAcak() {
             const karakter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let hasil = '';
@@ -47,7 +55,6 @@
             return hasil;
         }
 
-        // Fungsi tombol copy massal
         document.getElementById("btnCopy").addEventListener("click", () => {
             const hasilArea = document.getElementById("hasilLink");
             hasilArea.select();
@@ -56,28 +63,31 @@
         });
 
         document.getElementById("formLink").addEventListener("submit", async (e) => {
-            // Mencegah halaman reload otomatis saat tombol ditekan (Menghindari reset halaman)
             e.preventDefault(); 
             
             const btn = document.getElementById("btn");
             const inputArea = document.getElementById("bulkLinks");
             const boxHasil = document.getElementById("boxHasil");
             const hasilArea = document.getElementById("hasilLink");
+            const pilihanDomain = document.getElementById("pilihDomain").value;
 
             btn.disabled = true;
             btn.innerText = "Sedang Memproses Massal...";
             
             try {
-                // Ambil data text area, pisahkan berdasarkan baris, dan buang spasi kosong
                 const barisLink = inputArea.value.split("\n");
                 const kumpulanDataInsert = [];
                 const kumpulanHasilLink = [];
-                const baseUrl = window.location.origin;
+                
+                // LOGIKA MENENTUKAN BASE URL JEMBATAN
+                let baseUrl = window.location.origin;
+                if (pilihanDomain !== "AUTO") {
+                    baseUrl = pilihanDomain; // Pakai domain pilihan user dari dropdown
+                }
 
                 for (let link of barisLink) {
                     let linkBersih = link.trim();
                     if (linkBersih !== "") {
-                        // Buat kode ID acak otomatis untuk link ini
                         let kodeUnik = buatKodeAcak();
                         
                         kumpulanDataInsert.push({
@@ -85,7 +95,6 @@
                             link_tujuan: linkBersih
                         });
 
-                        // Format output menggunakan akhiran .mp4 palsu untuk mengelabui bot Facebook
                         kumpulanHasilLink.push(`${baseUrl}/${kodeUnik}.mp4`);
                     }
                 }
@@ -97,14 +106,12 @@
                     return;
                 }
 
-                // Masukkan data massal (Bulk Insert) ke Supabase dalam satu kali request
                 const { error } = await clientSupabase.from("link_jembatan").insert(kumpulanDataInsert);
                 
                 if (error) {
                     alert("Gagal menyimpan ke database Supabase: " + error.message);
                     console.error(error);
                 } else {
-                    // Tampilkan semua hasil link jembatan di kotak textarea bawah
                     hasilArea.value = kumpulanHasilLink.join("\n");
                     boxHasil.style.display = "block";
                 }

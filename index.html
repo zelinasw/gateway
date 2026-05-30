@@ -3,120 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menyiapkan Pemutar Video...</title>
+    <title>Portal Berita Cinema - Review Film Terupdate</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { 
-            font-family: Arial, sans-serif; 
-            background-color: #111; 
-            color: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f4f6f9; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
         }
-        .container {
+        .header-blog {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 15px 20px;
             text-align: center;
-            max-width: 90%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
-        .spinner { 
-            border: 4px solid rgba(255,255,255,0.1); 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 50%; 
-            border-left-color: #0099ff; 
-            animation: spin 1s linear infinite; 
-            margin: 0 auto 20px; 
+        .header-blog h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #007bff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Gaya Tombol "Lanjut Nonton" Darurat */
+        .main-content {
+            max-width: 650px;
+            margin: 25px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .meta-info {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 10px;
+        }
+        .artikel-teks p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444;
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+        /* Kotak Player & Tombol Nonton */
+        .player-box {
+            margin-top: 35px;
+            background-color: #111;
+            padding: 30px 20px;
+            border-radius: 6px;
+            text-align: center;
+            color: #fff;
+        }
+        #pesan-status {
+            font-size: 15px;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
         #linkManual {
-            display: none; /* Disembunyikan dulu, muncul kalau loading lambat atau sukses ketemu */
-            margin-top: 25px;
-            padding: 12px 24px;
-            background-color: #22c55e; /* Hijau cerah agar menarik perhatian */
+            display: none; /* Muncul otomatis setelah data supabase siap */
+            padding: 14px 28px;
+            background-color: #22c55e;
             color: #fff;
             font-weight: bold;
             font-size: 16px;
             text-decoration: none;
             border-radius: 5px;
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            animation: pulse 2s infinite;
         }
-        #linkManual:hover {
-            background-color: #16a34a;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="spinner"></div>
-        <h2 id="pesan">Menyiapkan Pemutar Video...</h2>
-        <p style="color: #aaa;">Mohon tunggu sejenak, sistem sedang mengamankan jalur.</p>
-        
-        <a href="#" id="linkManual">>>> KLIK DISINI UNTUK LANJUT NONTON <<<</a>
+
+    <!-- Samaran: Header Blog Berita Resmi -->
+    <div class="header-blog">
+        <h1>📰 KABAR CINEMA INDONESIA</h1>
+    </div>
+
+    <div class="main-content">
+        <!-- Samaran: Judul & Informasi Artikel -->
+        <h2 style="font-size: 22px; margin-top: 0; color: #222;">Perkembangan video viral Terbaru</h2>
+        <div class="meta-info">
+            Diposting oleh: Admin | Kategori: Edukasi viral terbaru
+        </div>
+
+        <!-- Teks Artikel Panjang Penipu Bot Facebook -->
+        <div class="artikel-teks">
+            <p>Selamat menonton siapkan tisue dan headset yaa😉 </p>
+        </div>
+
+        <!-- Bagian Kamar Nonton (Hanya di-scroll & diklik oleh manusia) -->
+        <div class="player-box">
+            <h3 style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
+            <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
+            
+            <!-- TOMBOL DIKLIK MANUAL -->
+            <a href="#" id="linkManual">👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇</a>
+        </div>
     </div>
 
     <script>
-        // Kredensial Supabase terbaru milikmu sudah terpasang benar
         const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const linkManualBtn = document.getElementById("linkManual");
+        const statusTeks = document.getElementById("pesan-status");
 
-        async function balikArah() {
+        async function prosesJembatan() {
             try {
-                // Mengambil kode unik dari URL dan membuang ekstensi palsu (.mp4 atau .map4)
                 let path = window.location.pathname.replace(/^\/|\.mp4$|\.map4$/g, "");
                 
-                // Jika halaman utama atau dashboard, abaikan fungsi redirect
-                if (!path || path === "dashboard" || path === "dashboard.html") return;
+                if (!path || path === "dashboard" || path === "dashboard.html") {
+                    statusTeks.innerText = "Dashboard Mode - Jalur Aman.";
+                    return;
+                }
 
-                // Mencari link tujuan asli di database Supabase berdasarkan kode_unik
                 const { data, error } = await clientSupabase
                     .from("link_jembatan")
                     .select("link_tujuan")
                     .eq("kode_unik", path)
                     .single();
 
-                if (error) {
-                    console.error("Database Error:", error);
-                    document.getElementById("pesan").innerText = "Link Tidak Ditemukan!";
+                if (error || !data || !data.link_tujuan) {
+                    statusTeks.innerText = "Maaf, tautan video ini tidak ditemukan atau sudah kedaluwarsa.";
                     return;
                 }
 
-                if (data && data.link_tujuan) {
-                    // Ketemu! Kita pasang link aslinya di tombol hijau
-                    linkManualBtn.href = data.link_tujuan;
-                    
-                    // Kita munculkan tombol hijau tersebut setelah 1 detik animasi loading berjalan
-                    // agar penonton tahu ada tombol darurat jika loading lambat
-                    setTimeout(() => {
-                        linkManualBtn.style.display = "inline-block";
-                    }, 1000);
+                // DATA KETEMU: Pasang ke tombol hijau, lalu tampilkan tombolnya
+                linkManualBtn.href = data.link_tujuan;
+                statusTeks.style.display = "none";
+                linkManualBtn.style.display = "block";
 
-                    // Proses redirect otomatis standar kita tetap berjalan setelah 3 detik
-                    setTimeout(() => { 
-                        // Cek dulu, kalau penonton belum klik tombol manual, redirect otomatis jalan
-                        if (window.location.href !== data.link_tujuan) {
-                            window.location.href = data.link_tujuan;
-                        }
-                    }, 3000);
+                // PERBAIKAN TOTAL: HAPUS REDIRECT OTOMATIS!
+                // Biarkan penonton yang klik sendiri secara manual agar bot FB terkecoh.
 
-                } else {
-                    document.getElementById("pesan").innerText = "Link Kedaluwarsa!";
-                }
             } catch (err) {
-                console.error("System Error:", err);
-                document.getElementById("pesan").innerText = "Terjadi Kesalahan Jaringan!";
+                console.error(err);
+                statusTeks.innerText = "Terjadi gangguan koneksi internet, silakan muat ulang.";
             }
         }
         
-        // Jalankan fungsi pengalihan saat halaman dimuat
-        balikArah();
+        prosesJembatan();
     </script>
 </body>
 </html>

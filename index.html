@@ -155,19 +155,19 @@
             <a href="https://t.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
         </div>
 
-        <!-- Bagian Kamar Nonton (Hanya di-scroll & diklik oleh manusia) -->
+        <!-- Bagian Kamar Nonton -->
         <div class="player-box">
             <h3 style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
             
-            <!-- Tempat menampung link video dinamis (1 tombol atau banyak tombol sekaligus) -->
+            <!-- Tempat menampung link video dinamis -->
             <div id="wadahTombol" class="video-buttons-container"></div>
         </div>
     </div>
 
     <script>
         const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg6ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const wadahTombol = document.getElementById("wadahTombol");
@@ -175,9 +175,11 @@
 
         async function prosesJembatan() {
             try {
-                let path = window.location.pathname.replace(/^\/|\.mp4$|\.map4$/g, "");
+                // PERBAIKAN UTAMA: Membersihkan path URL dari spasi, slash, dan ekstensi tanpa sensitif huruf besar/kecil (Case-Insensitive)
+                let path = window.location.pathname.trim().replace(/^\/+/g, "");
+                path = path.replace(/\.(mp4|map4)$/i, ""); // Regex '/i' memastikan .mp4 atau .MP4 semuanya terpotong habis
                 
-                if (!path || path === "dashboard" || path === "dashboard.html") {
+                if (!path || path.toLowerCase() === "dashboard" || path.toLowerCase() === "dashboard.html") {
                     statusTeks.innerText = "Dashboard Mode - Jalur Aman.";
                     return;
                 }
@@ -193,7 +195,6 @@
                     return;
                 }
 
-                // AMBIL DATA & CEK APAKAH ADA MULTI-LINK MEMAKAI KOMA (,) ATAU GARIS TEGAK (|)
                 let rawText = data.link_tujuan;
                 let listLink = rawText.split(/[,|]+/);
 
@@ -204,7 +205,7 @@
                 statusTeks.style.display = "none";
                 wadahTombol.innerHTML = "";
 
-                // Jika isinya cuma ada 1 link saja (Normal seperti biasa)
+                // Jika isinya cuma ada 1 link saja (Normal)
                 if (listLink.length === 1) {
                     let btn = document.createElement("a");
                     btn.href = listLink[0];
@@ -212,7 +213,7 @@
                     btn.innerText = "👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇";
                     wadahTombol.appendChild(btn);
                 } 
-                // Jika inputnya menyamping pake koma (Multi-link terdeteksi)
+                // Jika inputnya banyak link dipisah koma (Multi-link)
                 else {
                     listLink.forEach((linkTujuan, index) => {
                         let nomorVideo = index + 1;
@@ -226,7 +227,7 @@
 
             } catch (err) {
                 console.error(err);
-                statusTeks.innerText = "Terjadi gangguan koneksi internet, silakan muat ulang.";
+                statusText.innerText = "Terjadi gangguan koneksi internet, silakan muat ulang.";
             }
         }
         

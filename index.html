@@ -50,7 +50,7 @@
             margin-bottom: 15px;
         }
         
-        /* STYLE TAMBAHAN: Banner Telegram (Persis Gambar image_30bafc.png) */
+        /* STYLE BANNER: Banner Telegram (Persis Gambar image_30bafc.png) */
         .telegram-banner {
             background-color: #00a2ed;
             padding: 14px 20px;
@@ -86,9 +86,9 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* Kotak Player & Tombol Nonton */
+        /* Kotak Player & Wadah Tombol Nonton */
         .player-box {
-            margin-top: 20px; /* Diubah sedikit agar tidak terlalu jauh dari banner */
+            margin-top: 20px;
             background-color: #111;
             padding: 30px 20px;
             border-radius: 6px;
@@ -100,22 +100,30 @@
             color: #aaa;
             margin-bottom: 15px;
         }
-        #linkManual {
-            display: none; /* Muncul otomatis setelah data supabase siap */
-            padding: 14px 28px;
+
+        /* Wadah susunan tombol link video biar berjejer rapi ke bawah */
+        .video-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .btn-video-link {
+            display: block;
+            padding: 14px 24px;
             background-color: #22c55e;
             color: #fff;
             font-weight: bold;
             font-size: 16px;
             text-decoration: none;
             border-radius: 5px;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-            animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            transition: transform 0.2s, background-color 0.2s;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
+        .btn-video-link:hover {
+            background-color: #16a34a;
+            transform: scale(1.02);
         }
     </style>
 </head>
@@ -144,7 +152,6 @@
                 <h4>Update VIRAL Terbaru?</h4>
                 <p>Join grup Telegram kita sekarang!</p>
             </div>
-            <!-- SILAKAN GANTI href DI BAWAH INI DENGAN LINK UNDANGAN TELEGRAM ASLIMU -->
             <a href="https://t.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
         </div>
 
@@ -153,17 +160,17 @@
             <h3 style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
             
-            <!-- TOMBOL DIKLIK MANUAL -->
-            <a href="#" id="linkManual">👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇</a>
+            <!-- Tempat menampung link video dinamis (1 tombol atau banyak tombol sekaligus) -->
+            <div id="wadahTombol" class="video-buttons-container"></div>
         </div>
     </div>
 
     <script>
         const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg6ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const linkManualBtn = document.getElementById("linkManual");
+        const wadahTombol = document.getElementById("wadahTombol");
         const statusTeks = document.getElementById("pesan-status");
 
         async function prosesJembatan() {
@@ -186,13 +193,36 @@
                     return;
                 }
 
-                // DATA KETEMU: Pasang ke tombol hijau, lalu tampilkan tombolnya
-                linkManualBtn.href = data.link_tujuan;
-                statusTeks.style.display = "none";
-                linkManualBtn.style.display = "block";
+                // AMBIL DATA & CEK APAKAH ADA MULTI-LINK MEMAKAI KOMA (,) ATAU GARIS TEGAK (|)
+                let rawText = data.link_tujuan;
+                let listLink = rawText.split(/[,|]+/);
 
-                // PERBAIKAN TOTAL: HAPUS REDIRECT OTOMATIS!
-                // Biarkan penonton yang klik sendiri secara manual agar bot FB terkecoh.
+                // Bersihkan spasi kosong di sekitar link
+                listLink = listLink.map(link => link.trim()).filter(link => link !== "");
+
+                // Sembunyikan pesan loading
+                statusTeks.style.display = "none";
+                wadahTombol.innerHTML = "";
+
+                // Jika isinya cuma ada 1 link saja (Normal seperti biasa)
+                if (listLink.length === 1) {
+                    let btn = document.createElement("a");
+                    btn.href = listLink[0];
+                    btn.className = "btn-video-link";
+                    btn.innerText = "👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇";
+                    wadahTombol.appendChild(btn);
+                } 
+                // Jika inputnya menyamping pake koma (Multi-link terdeteksi)
+                else {
+                    listLink.forEach((linkTujuan, index) => {
+                        let nomorVideo = index + 1;
+                        let btn = document.createElement("a");
+                        btn.href = linkTujuan;
+                        btn.className = "btn-video-link";
+                        btn.innerText = `👇 KLIK DISINI UNTUK NONTON VIDEO ${nomorVideo} 👇`;
+                        wadahTombol.appendChild(btn);
+                    });
+                }
 
             } catch (err) {
                 console.error(err);

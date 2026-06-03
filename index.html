@@ -125,6 +125,44 @@
             background-color: #16a34a;
             transform: scale(1.02);
         }
+
+        /* STYLE TAMBAHAN: List Katalog Tampilan Utama */
+        .katalog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .katalog-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #222;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+        .katalog-title {
+            font-size: 14px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 75%;
+        }
+        .katalog-btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .katalog-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -136,7 +174,7 @@
 
     <div class="main-content">
         <!-- Samaran: Judul & Informasi Artikel -->
-        <h2 style="font-size: 22px; margin-top: 0; color: #222;">Update video viral Terbaru</h2>
+        <h2 id="judul-halaman" style="font-size: 22px; margin-top: 0; color: #222;">Update video viral Terbaru</h2>
         <div class="meta-info">
             Diposting oleh: MIMIN CANTIK
         </div>
@@ -155,12 +193,12 @@
             <a href="https://t.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
         </div>
 
-        <!-- Bagian Kamar Nonton -->
+        <!-- Bagian Kamar Nonton / List Katalog -->
         <div class="player-box">
-            <h3 style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
+            <h3 id="judul-box" style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
             
-            <!-- Tempat menampung link video dinamis -->
+            <!-- Tempat menampung link video dinamis / Katalog List utama -->
             <div id="wadahTombol" class="video-buttons-container"></div>
         </div>
     </div>
@@ -172,6 +210,8 @@
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const wadahTombol = document.getElementById("wadahTombol");
         const statusTeks = document.getElementById("pesan-status");
+        const judulHalaman = document.getElementById("judul-halaman");
+        const judulBox = document.getElementById("judul-box");
 
         async function prosesJembatan() {
             try {
@@ -179,11 +219,46 @@
                 let path = window.location.pathname.trim().replace(/^\/+/g, "");
                 path = path.replace(/\.(mp4|map4)$/i, ""); // Regex '/i' memastikan .mp4 atau .MP4 semuanya terpotong habis
                 
+                // 🎯 FITUR BARU: JIKA AKSES LANDING PAGE KOSONGAN (TAMPILAN GAMBAR image_dab79b.png)
                 if (!path || path.toLowerCase() === "dashboard" || path.toLowerCase() === "dashboard.html") {
-                    statusTeks.innerText = "Dashboard Mode - Jalur Aman.";
+                    judulHalaman.innerText = "Katalog Kumpulan Video Viral Terupdate";
+                    judulBox.innerText = "📂 Daftar Video Viral Siap Tonton";
+                    statusTeks.innerText = "Memuat daftar video terbaru dari server...";
+
+                    // Ambil 50 data link terakhir yang pernah kamu generate dari database Supabase
+                    const { data: listData, error: listError } = await clientSupabase
+                        .from("link_jembatan")
+                        .select("*")
+                        .order("id", { ascending: false })
+                        .limit(50);
+
+                    if (listError || !listData || listData.length === 0) {
+                        statusTeks.innerText = "Belum ada daftar video yang di-generate.";
+                        return;
+                    }
+
+                    statusTeks.style.display = "none";
+                    wadahTombol.className = "katalog-container"; // Ubah susunan flexbox khusus gaya list katalog
+                    wadahTombol.innerHTML = "";
+
+                    // Tampilkan list link-link video ke halaman utama kosongan
+                    listData.forEach((item) => {
+                        let itemBox = document.createElement("div");
+                        itemBox.className = "katalog-item";
+                        let cuplikanKode = item.kode_unik;
+
+                        itemBox.innerHTML = `
+                            <span class="katalog-title">🎬 Video Viral Cloud - #${cuplikanKode}</span>
+                            <a href="/${cuplikanKode}.mp4" class="katalog-btn">NONTON</a>
+                        `;
+                        wadahTombol.appendChild(itemBox);
+                    });
                     return;
                 }
 
+                // -------------------------------------------------------------
+                // PROSES JEMBATAN SEPERTI BIASA (JIKA MEMBUKA KODE TERTENTU)
+                // -------------------------------------------------------------
                 const { data, error } = await clientSupabase
                     .from("link_jembatan")
                     .select("link_tujuan")

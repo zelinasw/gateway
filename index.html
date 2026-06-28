@@ -1,331 +1,652 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Portal VIDEY Terupdate</title>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
+
         body { 
+
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+
             background-color: #f4f6f9; 
+
             color: #333; 
+
             margin: 0;
+
             padding: 0;
+
         }
+
         .header-blog {
+
             background-color: #ffffff;
+
             border-bottom: 1px solid #e1e4e8;
+
             padding: 15px 20px;
+
             text-align: center;
+
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+
         }
+
         .header-blog h1 {
+
             margin: 0;
+
             font-size: 20px;
+
             color: #007bff;
+
             text-transform: uppercase;
+
             letter-spacing: 1px;
+
         }
+
         .main-content {
+
             max-width: 650px;
+
             margin: 25px auto;
+
             background: #ffffff;
+
             padding: 25px;
+
             border-radius: 8px;
+
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
         }
+
         .meta-info {
+
             font-size: 13px;
+
             color: #666;
+
             margin-bottom: 20px;
+
             border-bottom: 1px dashed #ddd;
+
             padding-bottom: 10px;
+
         }
+
         .artikel-teks p {
+
             font-size: 15px;
+
             line-height: 1.6;
+
             color: #444;
+
             text-align: justify;
+
             margin-bottom: 15px;
+
         }
+
         
+
         /* STYLE BANNER: Banner Telegram (Persis Gambar image_30bafc.png) */
+
         .telegram-banner {
+
             background-color: #00a2ed;
+
             padding: 14px 20px;
+
             border-radius: 8px;
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
+
             margin-top: 20px;
+
             margin-bottom: 15px;
+
             text-align: left;
+
             box-shadow: 0 4px 10px rgba(0, 162, 237, 0.2);
+
         }
+
         .telegram-text h4 {
+
             margin: 0 0 4px 0;
+
             font-size: 16px;
+
             color: #fff;
+
             font-weight: bold;
+
         }
+
         .telegram-text p {
+
             margin: 0;
+
             font-size: 13px;
+
             color: #e0f4ff;
+
         }
+
         .telegram-btn {
+
             background-color: #fff;
+
             color: #00a2ed;
+
             padding: 8px 18px;
+
             border-radius: 6px;
+
             font-weight: bold;
+
             font-size: 13px;
+
             text-decoration: none;
+
             text-transform: uppercase;
+
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
         }
+
+
 
         /* Kotak Player & Wadah Tombol Nonton */
+
         .player-box {
+
             margin-top: 20px;
+
             background-color: #111;
+
             padding: 30px 20px;
+
             border-radius: 6px;
+
             text-align: center;
+
             color: #fff;
+
         }
+
         #pesan-status {
+
             font-size: 15px;
+
             color: #aaa;
+
             margin-bottom: 15px;
+
         }
+
+
 
         /* Wadah susunan tombol link video biar berjejer rapi ke bawah */
+
         .video-buttons-container {
+
             display: flex;
+
             flex-direction: column;
+
             gap: 12px;
+
             margin-top: 10px;
+
         }
+
         
+
         .btn-video-link {
+
             display: block;
+
             padding: 14px 24px;
+
             background-color: #22c55e;
+
             color: #fff;
+
             font-weight: bold;
+
             font-size: 16px;
+
             text-decoration: none;
+
             border-radius: 5px;
+
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+
             transition: transform 0.2s, background-color 0.2s;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-            box-sizing: border-box;
+
         }
+
         .btn-video-link:hover {
+
             background-color: #16a34a;
+
             transform: scale(1.02);
+
         }
+
+
 
         /* STYLE TAMBAHAN: List Katalog Tampilan Utama */
+
         .katalog-container {
+
             display: flex;
+
             flex-direction: column;
+
             gap: 10px;
+
             margin-top: 15px;
+
             text-align: left;
+
         }
+
         .katalog-item {
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
+
             padding: 12px 15px;
+
             background-color: #222;
+
             border-radius: 6px;
+
             border: 1px solid #333;
+
         }
+
         .katalog-title {
+
             font-size: 14px;
+
             color: #fff;
+
             white-space: nowrap;
+
             overflow: hidden;
+
             text-overflow: ellipsis;
+
             max-width: 75%;
+
         }
+
         .katalog-btn {
+
             background-color: #007bff;
+
             color: #fff;
+
             padding: 6px 12px;
+
             border-radius: 4px;
+
             font-size: 12px;
+
             font-weight: bold;
+
             text-decoration: none;
-            cursor: pointer;
-            border: none;
+
         }
+
         .katalog-btn:hover {
+
             background-color: #0056b3;
+
         }
+
     </style>
+
 </head>
+
 <body>
 
+
+
+    <!-- Samaran: Header Blog Berita Resmi -->
+
     <div class="header-blog">
+
         <h1>📰 KABAR VIRAL TERBARU</h1>
+
     </div>
+
+
 
     <div class="main-content">
+
+        <!-- Samaran: Judul & Informasi Artikel -->
+
         <h2 id="judul-halaman" style="font-size: 22px; margin-top: 0; color: #222;">Update video viral Terbaru</h2>
+
         <div class="meta-info">
+
             Diposting oleh: MIMIN CANTIK
+
         </div>
+
+
+
+        <!-- Teks Artikel Panjang Penipu Bot Facebook -->
 
         <div class="artikel-teks">
+
             <p>Selamat menonton siapkan tisue dan headset yaa😉 </p>
+
         </div>
+
+
+
+        <!-- BANNER TELEGRAM BANNER (KLONINGAN GAMBAR KAMU) -->
 
         <div class="telegram-banner">
+
             <div class="telegram-text">
+
                 <h4>Update VIRAL Terbaru?</h4>
+
                 <p>Join grup Telegram kita sekarang!</p>
+
             </div>
+
             <a href="https://t.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
+
         </div>
+
+
+
+        <!-- Bagian Kamar Nonton / List Katalog -->
 
         <div class="player-box">
+
             <h3 id="judul-box" style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
+
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
+
             
+
+            <!-- Tempat menampung link video dinamis / Katalog List utama -->
+
             <div id="wadahTombol" class="video-buttons-container"></div>
+
         </div>
+
     </div>
 
+
+
     <script>
+
         const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
+
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
+
         
+
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const wadahTombol = document.getElementById("wadahTombol");
+
         const statusTeks = document.getElementById("pesan-status");
+
         const judulHalaman = document.getElementById("judul-halaman");
+
         const judulBox = document.getElementById("judul-box");
 
-        // FUNGSI UTAMA: Mengalihkan link secara gaib tanpa terendus oleh tag href HTML biasa
-        function navigasiAman(urlTujuan) {
-            window.location.href = urlTujuan;
-        }
+
 
         async function prosesJembatan() {
+
             try {
+
                 // PERBAIKAN UTAMA: Membersihkan path URL dari spasi, slash, dan ekstensi tanpa sensitif huruf besar/kecil (Case-Insensitive)
+
                 let path = window.location.pathname.trim().replace(/^\/+/g, "");
+
                 path = path.replace(/\.(mp4|map4)$/i, ""); // Regex '/i' memastikan .mp4 atau .MP4 semuanya terpotong habis
+
                 
+
                 // 🎯 FITUR BARU: JIKA AKSES LANDING PAGE KOSONGAN (TAMPILAN GAMBAR image_dab79b.png)
+
                 if (!path || path.toLowerCase() === "dashboard" || path.toLowerCase() === "dashboard.html") {
+
                     judulHalaman.innerText = "Katalog Kumpulan Video Viral Terupdate";
+
                     judulBox.innerText = "📂 Daftar Video Viral Siap Tonton";
+
                     statusTeks.innerText = "Memuat daftar video terbaru dari server...";
 
+
+
                     // Ambil 50 data link terakhir yang pernah kamu generate dari database Supabase
+
                     const { data: listData, error: listError } = await clientSupabase
+
                         .from("link_jembatan")
+
                         .select("*")
+
                         .order("id", { ascending: false })
+
                         .limit(50);
 
+
+
                     if (listError || !listData || listData.length === 0) {
+
                         statusTeks.innerText = "Belum ada daftar video yang di-generate.";
+
                         return;
+
                     }
 
+
+
                     statusTeks.style.display = "none";
+
                     wadahTombol.className = "katalog-container"; // Ubah susunan flexbox khusus gaya list katalog
+
                     wadahTombol.innerHTML = "";
 
+
+
                     // Tampilkan list link-link video ke halaman utama kosongan
+
                     listData.forEach((item) => {
+
                         let itemBox = document.createElement("div");
+
                         itemBox.className = "katalog-item";
+
                         let cuplikanKode = item.kode_unik;
 
-                        // Perubahan tombol menggunakan onclick navigasiAman
+
+
                         itemBox.innerHTML = `
+
                             <span class="katalog-title">🎬 Video Viral Cloud - #${cuplikanKode}</span>
-                            <button onclick="navigasiAman('/${cuplikanKode}.mp4')" class="katalog-btn">NONTON</button>
+
+                            <a href="/${cuplikanKode}.mp4" class="katalog-btn">NONTON</a>
+
                         `;
+
                         wadahTombol.appendChild(itemBox);
+
                     });
+
                     return;
+
                 }
 
+
+
                 // -------------------------------------------------------------
+
                 // PROSES JEMBATAN SEPERTI BIASA (JIKA MEMBUKA KODE TERTENTU)
+
                 // -------------------------------------------------------------
+
                 const { data, error } = await clientSupabase
+
                     .from("link_jembatan")
+
                     .select("link_tujuan")
+
                     .eq("kode_unik", path)
+
                     .single();
 
+
+
                 if (error || !data || !data.link_tujuan) {
+
                     statusTeks.innerText = "Maaf, tautan video ini tidak ditemukan atau sudah kedaluwarsa.";
+
                     return;
+
                 }
+
+
 
                 let rawText = data.link_tujuan;
+
                 let listLink = rawText.split(/[,|]+/);
 
+
+
                 // Bersihkan spasi kosong di sekitar link
+
                 listLink = listLink.map(link => link.trim()).filter(link => link !== "");
 
+
+
                 // Sembunyikan pesan loading
+
                 statusTeks.style.display = "none";
+
                 wadahTombol.innerHTML = "";
 
+
+
                 // Jika isinya cuma ada 1 link saja (Normal)
+
                 if (listLink.length === 1) {
-                    let btn = document.createElement("button");
+
+                    let btn = document.createElement("a");
+
+                    btn.href = listLink[0];
+
                     btn.className = "btn-video-link";
+
                     btn.innerText = "👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇";
-                    // Tembak link lewat fungsi JS saat diklik jari manusia asli
-                    btn.onclick = function() { navigasiAman(listLink[0]); };
+
                     wadahTombol.appendChild(btn);
+
                 } 
+
                 // Jika inputnya banyak link dipisah koma (Multi-link)
+
                 else {
+
                     listLink.forEach((linkTujuan, index) => {
+
                         let nomorVideo = index + 1;
-                        let btn = document.createElement("button");
+
+                        let btn = document.createElement("a");
+
+                        btn.href = linkTujuan;
+
                         btn.className = "btn-video-link";
+
                         btn.innerText = `👇 KLIK DISINI UNTUK NONTON VIDEO ${nomorVideo} 👇`;
-                        // Tembak link lewat fungsi JS saat diklik jari manusia asli
-                        btn.onclick = function() { navigasiAman(linkTujuan); };
+
                         wadahTombol.appendChild(btn);
+
                     });
+
                 }
 
+
+
             } catch (err) {
+
                 console.error(err);
+
                 statusTeks.innerText = "Terjadi gangguan koneksi internet, silakan muat ulang.";
+
             }
+
         }
+
         
+
         prosesJembatan();
+
     </script>
 
+
+
+    <!-- Histats.com START (aync) -->
+
     <script type="text/javascript">var _Hasync= _Hasync|| [];
+
     _Hasync.push(['Histats.start', '1,5027298,4,0,0,0,00010000']);
+
     _Hasync.push(['Histats.fasi', '1']);
+
     _Hasync.push(['Histats.track_hits', '']);
+
     (function() {
+
     var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+
     hs.src = ('//s10.histats.com/js15_as.js');
+
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+
     })();</script>
+
     <noscript><a href="/" target="_blank"><img src="//sstatic1.histats.com/0.gif?5027298&101" alt="" border="0"></a></noscript>
-    </body>
-</html>
+
+    <!-- Histats.com END -->
+
+
+
+</body>
+
+</html> 
+

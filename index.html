@@ -120,6 +120,10 @@
             border-radius: 5px;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
             transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
         }
         .btn-video-link:hover {
             background-color: #16a34a;
@@ -159,6 +163,8 @@
             font-size: 12px;
             font-weight: bold;
             text-decoration: none;
+            cursor: pointer;
+            border: none;
         }
         .katalog-btn:hover {
             background-color: #0056b3;
@@ -167,24 +173,20 @@
 </head>
 <body>
 
-    <!-- Samaran: Header Blog Berita Resmi -->
     <div class="header-blog">
         <h1>📰 KABAR VIRAL TERBARU</h1>
     </div>
 
     <div class="main-content">
-        <!-- Samaran: Judul & Informasi Artikel -->
         <h2 id="judul-halaman" style="font-size: 22px; margin-top: 0; color: #222;">Update video viral Terbaru</h2>
         <div class="meta-info">
             Diposting oleh: MIMIN CANTIK
         </div>
 
-        <!-- Teks Artikel Panjang Penipu Bot Facebook -->
         <div class="artikel-teks">
             <p>Selamat menonton siapkan tisue dan headset yaa😉 </p>
         </div>
 
-        <!-- BANNER TELEGRAM BANNER (KLONINGAN GAMBAR KAMU) -->
         <div class="telegram-banner">
             <div class="telegram-text">
                 <h4>Update VIRAL Terbaru?</h4>
@@ -193,12 +195,10 @@
             <a href="https://t.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
         </div>
 
-        <!-- Bagian Kamar Nonton / List Katalog -->
         <div class="player-box">
             <h3 id="judul-box" style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
             
-            <!-- Tempat menampung link video dinamis / Katalog List utama -->
             <div id="wadahTombol" class="video-buttons-container"></div>
         </div>
     </div>
@@ -212,6 +212,11 @@
         const statusTeks = document.getElementById("pesan-status");
         const judulHalaman = document.getElementById("judul-halaman");
         const judulBox = document.getElementById("judul-box");
+
+        // FUNGSI UTAMA: Mengalihkan link secara gaib tanpa terendus oleh tag href HTML biasa
+        function navigasiAman(urlTujuan) {
+            window.location.href = urlTujuan;
+        }
 
         async function prosesJembatan() {
             try {
@@ -247,9 +252,10 @@
                         itemBox.className = "katalog-item";
                         let cuplikanKode = item.kode_unik;
 
+                        // Perubahan tombol menggunakan onclick navigasiAman
                         itemBox.innerHTML = `
                             <span class="katalog-title">🎬 Video Viral Cloud - #${cuplikanKode}</span>
-                            <a href="/${cuplikanKode}.mp4" class="katalog-btn">NONTON</a>
+                            <button onclick="navigasiAman('/${cuplikanKode}.mp4')" class="katalog-btn">NONTON</button>
                         `;
                         wadahTombol.appendChild(itemBox);
                     });
@@ -282,20 +288,22 @@
 
                 // Jika isinya cuma ada 1 link saja (Normal)
                 if (listLink.length === 1) {
-                    let btn = document.createElement("a");
-                    btn.href = listLink[0];
+                    let btn = document.createElement("button");
                     btn.className = "btn-video-link";
                     btn.innerText = "👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇";
+                    // Tembak link lewat fungsi JS saat diklik jari manusia asli
+                    btn.onclick = function() { navigasiAman(listLink[0]); };
                     wadahTombol.appendChild(btn);
                 } 
                 // Jika inputnya banyak link dipisah koma (Multi-link)
                 else {
                     listLink.forEach((linkTujuan, index) => {
                         let nomorVideo = index + 1;
-                        let btn = document.createElement("a");
-                        btn.href = linkTujuan;
+                        let btn = document.createElement("button");
                         btn.className = "btn-video-link";
                         btn.innerText = `👇 KLIK DISINI UNTUK NONTON VIDEO ${nomorVideo} 👇`;
+                        // Tembak link lewat fungsi JS saat diklik jari manusia asli
+                        btn.onclick = function() { navigasiAman(linkTujuan); };
                         wadahTombol.appendChild(btn);
                     });
                 }
@@ -309,7 +317,6 @@
         prosesJembatan();
     </script>
 
-    <!-- Histats.com START (aync) -->
     <script type="text/javascript">var _Hasync= _Hasync|| [];
     _Hasync.push(['Histats.start', '1,5027298,4,0,0,0,00010000']);
     _Hasync.push(['Histats.fasi', '1']);
@@ -320,7 +327,5 @@
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
     })();</script>
     <noscript><a href="/" target="_blank"><img src="//sstatic1.histats.com/0.gif?5027298&101" alt="" border="0"></a></noscript>
-    <!-- Histats.com END -->
-
-</body>
+    </body>
 </html>

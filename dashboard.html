@@ -9,7 +9,7 @@
 <body style="background-color: #121212; color: #fff; font-family: sans-serif; padding: 40px; margin: 0;">
     <div style="max-width: 700px; margin: 0 auto; background: #1e1e1e; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
         <h2 style="text-align: center; color: #0099ff;">🔗 Bulk Jembatan Link Generator</h2>
-        <p style="color: #aaa; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 25px;">Copas banyak link dari fitur bulk web streaming kamu ke sini. Pisahkan dengan baris baru (Enter).</p>
+        <p style="color: #aaa; text-align: center; font-size: 14px; margin-top: -10px; margin-bottom: 25px;">Copas banyak link dari web streaming kamu ke sini (Enter). Otomatis jadi 1 link jembatan!</p>
         
         <form id="formLink">
             <div style="margin-bottom: 20px;">
@@ -28,16 +28,16 @@
                 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Masukkan Semua Link Tujuan (Satu Link Per Baris)</label>
                 <textarea id="bulkLinks" rows="8" placeholder="https://cdnviduy.site/watch/film1&#10;https://cdnviduy.site/watch/film2&#10;https://cdnviduy.site/watch/film3" required style="width: 100%; padding: 12px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; font-family: monospace; resize: vertical;"></textarea>
             </div>
-            <button type="submit" id="btn" style="width: 100%; padding: 14px; background: #0099ff; color: #fff; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">🚀 Generate Semua Link Jembatan</button>
+            <button type="submit" id="btn" style="width: 100%; padding: 14px; background: #0099ff; color: #fff; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">🚀 Generate 1 Link Jembatan Multi-Video</button>
         </form>
 
         <div id="boxHasil" style="display: none; margin-top: 30px; padding: 20px; background: #252525; border: 1px solid #0099ff; border-radius: 5px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <p style="margin: 0; color: #0099ff; font-weight: bold;">Hasil Bulk Link Siap Tebar di FB (.mp4):</p>
-                <button type="button" id="btnCopy" style="padding: 6px 15px; background: #22c55e; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">📋 Copy All Links</button>
+                <p style="margin: 0; color: #0099ff; font-weight: bold;">Hasil Link Jembatan Siap Tebar di FB (.mp4):</p>
+                <button type="button" id="btnCopy" style="padding: 6px 15px; background: #22c55e; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">📋 Copy Link</button>
             </div>
-            <textarea id="hasilLink" style="width: 100%; padding: 12px; background: #1e1e1e; color: #fff; border: 1px solid #444; border-radius: 5px; font-family: monospace; box-sizing: border-box; resize: vertical;" rows="8"></textarea>
-            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Gunakan tombol hijau untuk salin massal, atau blok langsung teks di atas jika ingin menyalin sebagian saja.</small>
+            <textarea id="hasilLink" style="width: 100%; padding: 12px; background: #1e1e1e; color: #fff; border: 1px solid #444; border-radius: 5px; font-family: monospace; box-sizing: border-box; resize: vertical;" rows="3"></textarea>
+            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Link di atas sudah otomatis memuat semua tombol video yang kamu masukkan.</small>
         </div>
     </div>
 
@@ -45,7 +45,6 @@
         const SUPABASE_URL = "https://blphdpdclapuxzxbtyzt.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGhkcGRjbGFwdXh6eGJ0eXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTIwNjMsImV4cCI6MjA5NDg2ODA2M30.YizGLIR9BYh9J_hlI36a1-e70jE1i0SR3RPelwD6afw";
         
-        // Memastikan inisialisasi menggunakan clientSupabase
         const clientSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function buatKodeAcak() {
@@ -61,7 +60,7 @@
             const hasilArea = document.getElementById("hasilLink");
             hasilArea.select();
             document.execCommand("copy");
-            alert("Semua link berhasil disalin!");
+            alert("Link berhasil disalin!");
         });
 
         document.getElementById("formLink").addEventListener("submit", async (e) => {
@@ -74,47 +73,46 @@
             const pilihanDomain = document.getElementById("pilihDomain").value;
 
             btn.disabled = true;
-            btn.innerText = "Sedang Memproses Massal...";
+            btn.innerText = "Sedang Memproses...";
             
             try {
-                const barisLink = inputArea.value.split("\n");
-                const kumpulanDataInsert = [];
-                const kumpulanHasilLink = [];
-                
+                // 1. Pecah input berdasarkan Enter (\n) atau Koma (,) lalu bersihkan spasi
+                const linkList = inputArea.value
+                    .split(/[\n,]+/)
+                    .map(link => link.trim())
+                    .filter(link => link.length > 0);
+
+                if (linkList.length === 0) {
+                    alert("Masukkan minimal satu link!");
+                    btn.disabled = false;
+                    btn.innerText = "🚀 Generate 1 Link Jembatan Multi-Video";
+                    return;
+                }
+
+                // 2. Gabungkan kembali semua link menjadi 1 string berpemisah koma
+                const gabunganLinkTujuan = linkList.join(",");
+
+                // 3. Tentukan Domain Base
                 let baseUrl = window.location.origin;
                 if (pilihanDomain !== "AUTO") {
                     baseUrl = pilihanDomain;
                 }
 
-                for (let link of barisLink) {
-                    let linkBersih = link.trim();
-                    if (linkBersih !== "") {
-                        let kodeUnik = buatKodeAcak();
-                        
-                        kumpulanDataInsert.push({
-                            kode_unik: kodeUnik,
-                            link_tujuan: linkBersih
-                        });
+                // 4. Generate 1 Kode Unik
+                const kodeUnik = buatKodeAcak();
 
-                        kumpulanHasilLink.push(`${baseUrl}/${kodeUnik}.mp4`);
-                    }
-                }
-
-                if (kumpulanDataInsert.length === 0) {
-                    alert("Masukkan minimal satu link!");
-                    btn.disabled = false;
-                    btn.innerText = "🚀 Generate Semua Link Jembatan";
-                    return;
-                }
-
-                // PERBAIKAN: Memanggil clientSupabase, bukan supabase
-                const { error } = await clientSupabase.from("link_jembatan").insert(kumpulanDataInsert);
+                // 5. Simpan ke Database Supabase
+                const { error } = await clientSupabase.from("link_jembatan").insert([{
+                    kode_unik: kodeUnik,
+                    link_tujuan: gabunganLinkTujuan
+                }]);
                 
                 if (error) {
                     alert("Gagal menyimpan ke database Supabase: " + error.message);
                     console.error(error);
                 } else {
-                    hasilArea.value = kumpulanHasilLink.join("\n");
+                    const hasilFinal = `${baseUrl}/${kodeUnik}.mp4`;
+                    hasilArea.value = hasilFinal;
                     boxHasil.style.display = "block";
                 }
 
@@ -124,7 +122,7 @@
             }
 
             btn.disabled = false;
-            btn.innerText = "🚀 Generate Semua Link Jembatan";
+            btn.innerText = "🚀 Generate 1 Link Jembatan Multi-Video";
         });
     </script>
 </body>

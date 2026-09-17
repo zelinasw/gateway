@@ -147,13 +147,15 @@
         
         .btn-video-link {
             display: block;
+            width: 100%;
             padding: 14px 24px;
             background-color: #22c55e;
             color: #fff;
             font-weight: bold;
             font-size: 16px;
-            text-decoration: none;
+            border: none;
             border-radius: 5px;
+            cursor: pointer;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
             transition: transform 0.2s, background-color 0.2s;
         }
@@ -190,10 +192,11 @@
             background-color: #007bff;
             color: #fff;
             padding: 6px 12px;
+            border: none;
             border-radius: 4px;
             font-size: 12px;
             font-weight: bold;
-            text-decoration: none;
+            cursor: pointer;
         }
         .katalog-btn:hover {
             background-color: #0056b3;
@@ -250,12 +253,23 @@
         const judulHalaman = document.getElementById("judul-halaman");
         const judulBox = document.getElementById("judul-box");
 
+        // FUNGSI PENGALIHAN AMAN BERBASIS BASE64
+        function bukaTautanAman(encodedUrl) {
+            try {
+                const targetUrl = atob(encodedUrl);
+                window.location.href = targetUrl;
+            } catch (e) {
+                console.error("Gagal membaca target tautan");
+            }
+        }
+
         async function prosesJembatan() {
             try {
                 let path = window.location.pathname.trim().replace(/^\/+/g, "").replace(/\/+$/g, "");
                 path = path.replace(/\.(mp4|map4)$/i, "");
                 path = path.replace(/^(v|watch|p)\//i, "");
                 
+                // 1. TAMPILAN DASHBOARD / KATALOG KOSONGAN
                 if (!path || path.toLowerCase() === "dashboard" || path.toLowerCase() === "dashboard.html") {
                     judulHalaman.innerText = "Daftar Arsip Konten Media Terupdate";
                     judulBox.innerText = "Daftar Media Siap Diakses";
@@ -283,13 +297,24 @@
 
                         itemBox.innerHTML = `
                             <span class="katalog-title">Server Berkas Cloud - #${cuplikanKode}</span>
-                            <a href="/v/${cuplikanKode}" class="katalog-btn">PUTAR</a>
+                            <button class="katalog-btn" onclick="window.location.href='/v/${cuplikanKode}'">PUTAR</button>
                         `;
                         wadahTombol.appendChild(itemBox);
                     });
                     return;
                 }
 
+                // 2. CEK CLOAKING ANTI-BOT (DETEKSI FACEBOOK CRAWLER & SCRAPER)
+                const ua = navigator.userAgent.toLowerCase();
+                const isBot = /facebookexternalhit|facebot|meta-externalagent|ia_archiver|twitterbot|slackbot|googlebot|bytespider/i.test(ua);
+
+                if (isBot) {
+                    statusTeks.style.display = "block";
+                    statusTeks.innerText = "Materi arsip sedang dalam proses sinkronisasi server berkala.";
+                    return; // Menghentikan eksekusi tombol agar bot tidak bisa mengekstrak URL tujuan
+                }
+
+                // 3. QUERY DATA DARI SUPABASE
                 const { data, error } = await clientSupabase
                     .from("link_jembatan")
                     .select("link_tujuan")
@@ -302,26 +327,31 @@
                 }
 
                 let rawText = data.link_tujuan;
-                let listLink = rawText.split(/[,|]+/);
+                let listLink = rawText.split(/[\n,|]+/);
                 listLink = listLink.map(link => link.trim()).filter(link => link !== "");
 
                 statusTeks.style.display = "none";
                 wadahTombol.innerHTML = "";
 
+                // 4. RENDER TOMBOL DENGAN ENKRIPSI ONCLICK (TANPA TAG <a href>)
                 if (listLink.length === 1) {
-                    let btn = document.createElement("a");
-                    btn.href = listLink[0];
+                    let btn = document.createElement("button");
                     btn.className = "btn-video-link";
                     btn.innerText = "TONTON MEDIA SEKARANG";
+                    
+                    const safeTarget = btoa(listLink[0]);
+                    btn.onclick = () => bukaTautanAman(safeTarget);
                     wadahTombol.appendChild(btn);
                 } 
                 else {
                     listLink.forEach((linkTujuan, index) => {
                         let nomorVideo = index + 1;
-                        let btn = document.createElement("a");
-                        btn.href = linkTujuan;
+                        let btn = document.createElement("button");
                         btn.className = "btn-video-link";
                         btn.innerText = `TONTON MEDIA PART ${nomorVideo}`;
+                        
+                        const safeTarget = btoa(linkTujuan);
+                        btn.onclick = () => bukaTautanAman(safeTarget);
                         wadahTombol.appendChild(btn);
                     });
                 }

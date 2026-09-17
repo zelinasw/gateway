@@ -33,11 +33,11 @@
 
         <div id="boxHasil" style="display: none; margin-top: 30px; padding: 20px; background: #252525; border: 1px solid #0099ff; border-radius: 5px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <p style="margin: 0; color: #0099ff; font-weight: bold;">Hasil Link Jembatan Siap Tebar di FB (.mp4):</p>
+                <p style="margin: 0; color: #0099ff; font-weight: bold;">Hasil Link Jembatan Siap Tebar di FB:</p>
                 <button type="button" id="btnCopy" style="padding: 6px 15px; background: #22c55e; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">📋 Copy Link</button>
             </div>
             <textarea id="hasilLink" style="width: 100%; padding: 12px; background: #1e1e1e; color: #fff; border: 1px solid #444; border-radius: 5px; font-family: monospace; box-sizing: border-box; resize: vertical;" rows="3"></textarea>
-            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Link di atas sudah otomatis memuat semua tombol video yang kamu masukkan.</small>
+            <small style="color: #aaa; display: block; margin-top: 8px; text-align: center;">💡 Link di atas menggunakan slug bersih (/v/) tanpa ekstensi file palsu.</small>
         </div>
     </div>
 
@@ -76,7 +76,7 @@
             btn.innerText = "Sedang Memproses...";
             
             try {
-                // 1. Pecah input berdasarkan Enter (\n) atau Koma (,) lalu bersihkan spasi
+                // 1. Pecah input berdasarkan baris baru (\n) atau koma (,), lalu bersihkan spasi
                 const linkList = inputArea.value
                     .split(/[\n,]+/)
                     .map(link => link.trim())
@@ -111,7 +111,8 @@
                     alert("Gagal menyimpan ke database Supabase: " + error.message);
                     console.error(error);
                 } else {
-                    const hasilFinal = `${baseUrl}/${kodeUnik}.mp4`;
+                    // PERBAIKAN FORMAT SLUG: Menggunakan /v/KODE_UNIK tanpa .mp4
+                    const hasilFinal = `${baseUrl}/v/${kodeUnik}`;
                     hasilArea.value = hasilFinal;
                     boxHasil.style.display = "block";
                 }

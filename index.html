@@ -49,79 +49,6 @@
             text-align: justify;
             margin-bottom: 15px;
         }
-        
-        /* STYLE BANNER: Telegram */
-        .telegram-banner {
-            background-color: #00a2ed;
-            padding: 14px 20px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            text-align: left;
-            box-shadow: 0 4px 10px rgba(0, 162, 237, 0.2);
-        }
-        .telegram-text h4 {
-            margin: 0 0 4px 0;
-            font-size: 16px;
-            color: #fff;
-            font-weight: bold;
-        }
-        .telegram-text p {
-            margin: 0;
-            font-size: 13px;
-            color: #e0f4ff;
-        }
-        .telegram-btn {
-            background-color: #fff;
-            color: #00a2ed;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            text-decoration: none;
-            text-transform: uppercase;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* STYLE BANNER: Koleksi Web */
-        .web-banner {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            padding: 14px 20px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            text-align: left;
-            box-shadow: 0 4px 10px rgba(255, 75, 43, 0.25);
-        }
-        .web-banner-text h4 {
-            margin: 0 0 4px 0;
-            font-size: 16px;
-            color: #fff;
-            font-weight: bold;
-        }
-        .web-banner-text p {
-            margin: 0;
-            font-size: 13px;
-            color: #fff0f0;
-        }
-        .web-banner-btn {
-            background-color: #fff;
-            color: #ff4b2b;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 12px;
-            text-decoration: none;
-            text-transform: uppercase;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            white-space: nowrap;
-        }
 
         /* Kotak Media Player & Tombol */
         .player-box {
@@ -219,22 +146,6 @@
             <p>Halaman ini memuat tautan arsip digital dan pemutar media daring. Pastikan koneksi internet stabil untuk mengakses seluruh materi melalui tombol server di bawah ini.</p>
         </div>
 
-        <div class="telegram-banner">
-            <div class="telegram-text">
-                <h4>Informasi Media Tercepat?</h4>
-                <p>Ikuti saluran komunitas resmi kami sekarang!</p>
-            </div>
-            <a href="https://telegram.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
-        </div>
-
-        <div class="web-banner">
-            <div class="web-banner-text">
-                <h4>Katalog Arsip Lengkap</h4>
-                <p>Akses arsip dokumen dan tautan streaming tanpa batas!</p>
-            </div>
-            <a href="https://streamku.fun/dashboard" target="_blank" rel="noreferrer" class="web-banner-btn">LIHAT ARSIP</a>
-        </div>
-
         <div class="player-box">
             <h3 id="judul-box" style="margin-top: 0; color: #fff;">Pemutar Media Siap Diputar</h3>
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
@@ -253,7 +164,6 @@
         const judulHalaman = document.getElementById("judul-halaman");
         const judulBox = document.getElementById("judul-box");
 
-        // FUNGSI PENGALIHAN AMAN BERBASIS BASE64
         function bukaTautanAman(encodedUrl) {
             try {
                 const targetUrl = atob(encodedUrl);
@@ -311,7 +221,7 @@
                 if (isBot) {
                     statusTeks.style.display = "block";
                     statusTeks.innerText = "Materi arsip sedang dalam proses sinkronisasi server berkala.";
-                    return; // Menghentikan eksekusi tombol agar bot tidak bisa mengekstrak URL tujuan
+                    return;
                 }
 
                 // 3. QUERY DATA DARI SUPABASE

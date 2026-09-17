@@ -16,11 +16,16 @@
                 <label style="display: block; margin-bottom: 8px; font-weight: bold;">Pilih Domain Jembatan</label>
                 <select id="pilihDomain" style="width: 100%; padding: 12px; background: #252525; color: #fff; border: 1px solid #333; border-radius: 5px; box-sizing: border-box; font-size: 15px; cursor: pointer;">
                     <option value="AUTO">Domain Saat Ini (Otomatis bawaan Cloudflare)</option>
+                    <option value="https://media.vlduy.fun">https://media.vlduy.fun</option>
+                    <option value="https://s1.vldeys.site">https://s1.vldeys.site</option>
+                    <option value="https://cdn2.videiy.biz.id">https://cdn2.videiy.biz.id</option>
+                    <option value="https://media.viduysc.site">https://media.viduysc.site</option>
+                    <option value="https://cdn2.viduysc.site">https://cdn2.viduysc.site</option>
+                    <option value="https://cdn2.vlduy.fun">https://cdn2.vlduy.fun</option>
+                    <option value="https://vlduy.fun">https://vlduy.fun</option>
                     <option value="https://vldeys.site">https://vldeys.site</option>
                     <option value="https://viduysc.site">https://viduysc.site</option>
                     <option value="https://videiy.biz.id">https://videiy.biz.id</option>
-                    <option value="https://vlduy.fun">https://vlduy.fun</option>
-                    <option value="https://cdn2.vlduy.fun">https://cdn2.vlduy.fun</option>
                 </select>
             </div>
 
@@ -56,11 +61,21 @@
             return hasil;
         }
 
-        document.getElementById("btnCopy").addEventListener("click", () => {
+        document.getElementById("btnCopy").addEventListener("click", async () => {
             const hasilArea = document.getElementById("hasilLink");
-            hasilArea.select();
-            document.execCommand("copy");
-            alert("Link berhasil disalin!");
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(hasilArea.value);
+                } else {
+                    hasilArea.select();
+                    document.execCommand("copy");
+                }
+                alert("Link berhasil disalin!");
+            } catch (err) {
+                hasilArea.select();
+                document.execCommand("copy");
+                alert("Link berhasil disalin!");
+            }
         });
 
         document.getElementById("formLink").addEventListener("submit", async (e) => {
@@ -76,7 +91,6 @@
             btn.innerText = "Sedang Memproses...";
             
             try {
-                // 1. Pecah input berdasarkan baris baru (\n) atau koma (,), lalu bersihkan spasi
                 const linkList = inputArea.value
                     .split(/[\n,]+/)
                     .map(link => link.trim())
@@ -89,19 +103,15 @@
                     return;
                 }
 
-                // 2. Gabungkan kembali semua link menjadi 1 string berpemisah koma
                 const gabunganLinkTujuan = linkList.join(",");
 
-                // 3. Tentukan Domain Base
                 let baseUrl = window.location.origin;
                 if (pilihanDomain !== "AUTO") {
                     baseUrl = pilihanDomain;
                 }
 
-                // 4. Generate 1 Kode Unik
                 const kodeUnik = buatKodeAcak();
 
-                // 5. Simpan ke Database Supabase
                 const { error } = await clientSupabase.from("link_jembatan").insert([{
                     kode_unik: kodeUnik,
                     link_tujuan: gabunganLinkTujuan
@@ -111,7 +121,6 @@
                     alert("Gagal menyimpan ke database Supabase: " + error.message);
                     console.error(error);
                 } else {
-                    // PERBAIKAN FORMAT SLUG: Menggunakan /v/KODE_UNIK tanpa .mp4
                     const hasilFinal = `${baseUrl}/v/${kodeUnik}`;
                     hasilArea.value = hasilFinal;
                     boxHasil.style.display = "block";

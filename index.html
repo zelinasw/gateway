@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal VIDEY Terupdate</title>
+    <title>Portal Informasi Terkini</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { 
@@ -50,7 +50,7 @@
             margin-bottom: 15px;
         }
         
-        /* STYLE BANNER: Banner Telegram */
+        /* STYLE BANNER: Telegram */
         .telegram-banner {
             background-color: #00a2ed;
             padding: 14px 20px;
@@ -86,7 +86,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* STYLE BANNER: Banner Web Utama / Koleksi Viral */
+        /* STYLE BANNER: Koleksi Web */
         .web-banner {
             background: linear-gradient(135deg, #ff416c, #ff4b2b);
             padding: 14px 20px;
@@ -123,7 +123,7 @@
             white-space: nowrap;
         }
 
-        /* Kotak Player & Wadah Tombol Nonton */
+        /* Kotak Media Player & Tombol */
         .player-box {
             margin-top: 20px;
             background-color: #111;
@@ -138,7 +138,6 @@
             margin-bottom: 15px;
         }
 
-        /* Wadah susunan tombol link video */
         .video-buttons-container {
             display: flex;
             flex-direction: column;
@@ -163,7 +162,6 @@
             transform: scale(1.02);
         }
 
-        /* STYLE TAMBAHAN: List Katalog Tampilan Utama */
         .katalog-container {
             display: flex;
             flex-direction: column;
@@ -205,37 +203,37 @@
 <body>
 
     <div class="header-blog">
-        <h1>📰 KABAR VIRAL TERBARU</h1>
+        <h1>PORTAL INFORMASI TERKINI</h1>
     </div>
 
     <div class="main-content">
-        <h2 id="judul-halaman" style="font-size: 22px; margin-top: 0; color: #222;">Update video viral Terbaru</h2>
+        <h2 id="judul-halaman" style="font-size: 22px; margin-top: 0; color: #222;">Pembaruan Konten Media Digital</h2>
         <div class="meta-info">
-            Diposting oleh: MIMIN CANTIK
+            Kategori: Informasi & Teknologi Terkini
         </div>
 
         <div class="artikel-teks">
-            <p>Selamat menonton siapkan tisue dan headset yaa😉 </p>
+            <p>Halaman ini memuat tautan arsip digital dan pemutar media daring. Pastikan koneksi internet stabil untuk mengakses seluruh materi melalui tombol server di bawah ini.</p>
         </div>
 
         <div class="telegram-banner">
             <div class="telegram-text">
-                <h4>Update VIRAL Terbaru?</h4>
-                <p>Join grup Telegram kita sekarang!</p>
+                <h4>Informasi Media Tercepat?</h4>
+                <p>Ikuti saluran komunitas resmi kami sekarang!</p>
             </div>
             <a href="https://telegram.me/+Az4uGyWA9Q5kNTI1" target="_blank" rel="noreferrer" class="telegram-btn">JOIN</a>
         </div>
 
         <div class="web-banner">
             <div class="web-banner-text">
-                <h4>Koleksi Viral Lengkap+bisa di download</h4>
-                <p>Akses ribuan video terlengkap tanpa batas!</p>
+                <h4>Katalog Arsip Lengkap</h4>
+                <p>Akses arsip dokumen dan tautan streaming tanpa batas!</p>
             </div>
-            <a href="https://streamku.fun/dashboard" target="_blank" rel="noreferrer" class="web-banner-btn">TONTON SEKARANG</a>
+            <a href="https://streamku.fun/dashboard" target="_blank" rel="noreferrer" class="web-banner-btn">LIHAT ARSIP</a>
         </div>
 
         <div class="player-box">
-            <h3 id="judul-box" style="margin-top: 0; color: #fff;">📺 Pemutar Video Player Siap</h3>
+            <h3 id="judul-box" style="margin-top: 0; color: #fff;">Pemutar Media Siap Diputar</h3>
             <p id="pesan-status">Menghubungkan jalur aman ke server cloud...</p>
             
             <div id="wadahTombol" class="video-buttons-container"></div>
@@ -254,20 +252,14 @@
 
         async function prosesJembatan() {
             try {
-                // 1. Bersihkan path URL dari spasi serta garis miring di awal & akhir
                 let path = window.location.pathname.trim().replace(/^\/+/g, "").replace(/\/+$/g, "");
-                
-                // 2. Bersihkan ekstensi lama (.mp4/.map4) jika ada link lama yang dibuka
                 path = path.replace(/\.(mp4|map4)$/i, "");
-                
-                // 3. Bersihkan prefix slug baru (/v/ atau /watch/)
                 path = path.replace(/^(v|watch|p)\//i, "");
                 
-                // JIKA AKSES LANDING PAGE KOSONGAN / DASHBOARD
                 if (!path || path.toLowerCase() === "dashboard" || path.toLowerCase() === "dashboard.html") {
-                    judulHalaman.innerText = "Katalog Kumpulan Video Viral Terupdate";
-                    judulBox.innerText = "📂 Daftar Video Viral Siap Tonton";
-                    statusTeks.innerText = "Memuat daftar video terbaru dari server...";
+                    judulHalaman.innerText = "Daftar Arsip Konten Media Terupdate";
+                    judulBox.innerText = "Daftar Media Siap Diakses";
+                    statusTeks.innerText = "Memuat daftar tautan terbaru dari server...";
 
                     const { data: listData, error: listError } = await clientSupabase
                         .from("link_jembatan")
@@ -276,7 +268,7 @@
                         .limit(50);
 
                     if (listError || !listData || listData.length === 0) {
-                        statusTeks.innerText = "Belum ada daftar video yang di-generate.";
+                        statusTeks.innerText = "Belum ada daftar tautan yang tersedia.";
                         return;
                     }
 
@@ -290,15 +282,14 @@
                         let cuplikanKode = item.kode_unik;
 
                         itemBox.innerHTML = `
-                            <span class="katalog-title">🎬 Video Viral Cloud - #${cuplikanKode}</span>
-                            <a href="/v/${cuplikanKode}" class="katalog-btn">NONTON</a>
+                            <span class="katalog-title">Server Berkas Cloud - #${cuplikanKode}</span>
+                            <a href="/v/${cuplikanKode}" class="katalog-btn">PUTAR</a>
                         `;
                         wadahTombol.appendChild(itemBox);
                     });
                     return;
                 }
 
-                // AMBIL DATA DARI SUPABASE BERDASARKAN KODE UNIK
                 const { data, error } = await clientSupabase
                     .from("link_jembatan")
                     .select("link_tujuan")
@@ -306,7 +297,7 @@
                     .single();
 
                 if (error || !data || !data.link_tujuan) {
-                    statusTeks.innerText = "Maaf, tautan video ini tidak ditemukan atau sudah kedaluwarsa.";
+                    statusTeks.innerText = "Maaf, tautan berkas ini tidak ditemukan atau masa aktifnya telah berakhir.";
                     return;
                 }
 
@@ -321,7 +312,7 @@
                     let btn = document.createElement("a");
                     btn.href = listLink[0];
                     btn.className = "btn-video-link";
-                    btn.innerText = "👇 KLIK DISINI UNTUK MULAI NONTON (MP4) 👇";
+                    btn.innerText = "TONTON MEDIA SEKARANG";
                     wadahTombol.appendChild(btn);
                 } 
                 else {
@@ -330,7 +321,7 @@
                         let btn = document.createElement("a");
                         btn.href = linkTujuan;
                         btn.className = "btn-video-link";
-                        btn.innerText = `👇 KLIK DISINI UNTUK NONTON VIDEO ${nomorVideo} 👇`;
+                        btn.innerText = `TONTON MEDIA PART ${nomorVideo}`;
                         wadahTombol.appendChild(btn);
                     });
                 }

@@ -85,6 +85,7 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
             transition: transform 0.2s, background-color 0.2s;
+            box-sizing: border-box;
         }
         .btn-video-link:hover {
             background-color: #16a34a;
@@ -166,21 +167,31 @@
 
         function bukaTautanAman(encodedUrl) {
             try {
-                const targetUrl = atob(encodedUrl);
+                // Decode aman untuk URI encoding
+                const targetUrl = decodeURIComponent(escape(atob(encodedUrl)));
                 window.location.href = targetUrl;
             } catch (e) {
-                console.error("Gagal membaca target tautan");
+                // Fallback decode langsung jika standar
+                try {
+                    window.location.href = atob(encodedUrl);
+                } catch (err) {
+                    console.error("Gagal membaca target tautan");
+                }
             }
         }
 
         async function prosesJembatan() {
             try {
-                let path = window.location.pathname.trim().replace(/^\/+/g, "").replace(/\/+$/g, "");
-                path = path.replace(/\.(mp4|map4)$/i, "");
-                path = path.replace(/^(v|watch|p)\//i, "");
-                
-                // 1. TAMPILAN DASHBOARD / KATALOG KOSONGAN
-                if (!path || path.toLowerCase() === "dashboard" || path.toLowerCase() === "dashboard.html") {
+                // Ekstraksi path yang lebih tahan terhadap trailing slash & karakter ekstra
+                const fullPath = window.location.pathname.replace(/\/+$/, "");
+                const segments = fullPath.split("/").filter(Boolean);
+
+                // 1. TAMPILAN DASHBOARD / KATALOG
+                const isDashboard = segments.length === 0 || 
+                                    segments[0].toLowerCase() === "dashboard" || 
+                                    segments[0].toLowerCase() === "dashboard.html";
+
+                if (isDashboard) {
                     judulHalaman.innerText = "Daftar Arsip Konten Media Terupdate";
                     judulBox.innerText = "Daftar Media Siap Diakses";
                     statusTeks.innerText = "Memuat daftar tautan terbaru dari server...";
@@ -214,7 +225,11 @@
                     return;
                 }
 
-                // 2. CEK CLOAKING ANTI-BOT (DETEKSI FACEBOOK CRAWLER & SCRAPER)
+                // Ambil kode unik: jika URL formatnya /v/KODE123 maka ambil KODE123
+                let kodeUnik = segments[segments.length - 1];
+                kodeUnik = kodeUnik.replace(/\.(mp4|map4)$/i, "").trim();
+
+                // 2. CEK CLOAKING ANTI-BOT (LAYER CADANGAN BROWSER)
                 const ua = navigator.userAgent.toLowerCase();
                 const isBot = /facebookexternalhit|facebot|meta-externalagent|ia_archiver|twitterbot|slackbot|googlebot|bytespider/i.test(ua);
 
@@ -224,11 +239,11 @@
                     return;
                 }
 
-                // 3. QUERY DATA DARI SUPABASE
+                // 3. QUERY DATA SUPABASE
                 const { data, error } = await clientSupabase
                     .from("link_jembatan")
                     .select("link_tujuan")
-                    .eq("kode_unik", path)
+                    .eq("kode_unik", kodeUnik)
                     .single();
 
                 if (error || !data || !data.link_tujuan) {
@@ -237,19 +252,20 @@
                 }
 
                 let rawText = data.link_tujuan;
-                let listLink = rawText.split(/[\n,|]+/);
-                listLink = listLink.map(link => link.trim()).filter(link => link !== "");
+                let listLink = rawText.split(/[\n,|]+/)
+                    .map(link => link.trim())
+                    .filter(link => link !== "");
 
                 statusTeks.style.display = "none";
                 wadahTombol.innerHTML = "";
 
-                // 4. RENDER TOMBOL DENGAN ENKRIPSI ONCLICK (TANPA TAG <a href>)
+                // 4. RENDER TOMBOL TERENKRIPSI
                 if (listLink.length === 1) {
                     let btn = document.createElement("button");
                     btn.className = "btn-video-link";
                     btn.innerText = "TONTON MEDIA SEKARANG";
                     
-                    const safeTarget = btoa(listLink[0]);
+                    const safeTarget = btoa(unescape(encodeURIComponent(listLink[0])));
                     btn.onclick = () => bukaTautanAman(safeTarget);
                     wadahTombol.appendChild(btn);
                 } 
@@ -260,7 +276,7 @@
                         btn.className = "btn-video-link";
                         btn.innerText = `TONTON MEDIA PART ${nomorVideo}`;
                         
-                        const safeTarget = btoa(linkTujuan);
+                        const safeTarget = btoa(unescape(encodeURIComponent(linkTujuan)));
                         btn.onclick = () => bukaTautanAman(safeTarget);
                         wadahTombol.appendChild(btn);
                     });
